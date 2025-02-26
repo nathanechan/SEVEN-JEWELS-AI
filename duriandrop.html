@@ -26,44 +26,37 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 15vw; /* 默认桌面大小 */
-            height: auto;
-            background-image: url('img/logogame.png');
+            width: 150px;
+            height: 150px;
             background-size: contain;
             background-repeat: no-repeat;
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
-        }
-        @media (max-width: 768px) { /* 移动设备 */
-            #logo {
-                width: 25vw;
-            }
         }
         #mascot {
             position: absolute;
             bottom: 5vh;
-            width: 15vw;
-            height: 12vh;
-            background-image: url('img/sevenjewelsgame.png');
+            width: 100px;
+            height: 80px;
             background-size: contain;
             background-repeat: no-repeat;
         }
         .durian {
             position: absolute;
-            width: 5vw;
-            height: 5vw;
-            background-image: url('img/duriangame.png');
+            width: 50px;
+            height: 50px;
             background-size: cover;
             border-radius: 50%;
         }
         #score, #lives {
             position: absolute;
-            top: 2vh;
+            top: 10px;
             color: #fff;
-            font-size: 4vw;
+            font-size: 24px;
+            z-index: 1;
         }
-        #score { left: 2vw; }
-        #lives { right: 2vw; }
+        #score { left: 10px; }
+        #lives { right: 10px; }
         #game-over {
             position: absolute;
             top: 50%;
@@ -72,23 +65,24 @@
             text-align: center;
             display: none;
             color: #fff;
+            z-index: 2;
         }
         #game-over h1 {
-            font-size: 6vw;
+            font-size: 48px;
         }
         #game-over p {
-            font-size: 4vw;
+            font-size: 24px;
         }
         button {
-            padding: 2vw 4vw;
-            font-size: 3vw;
+            padding: 10px 20px;
+            font-size: 18px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="logo"></div> <!-- 添加LOGO -->
+        <div id="logo"></div>
         <div id="mascot"></div>
         <div id="score">得分: 0</div>
         <div id="lives">生命: 3</div>
@@ -106,28 +100,42 @@
         const livesDisplay = document.getElementById('lives');
         const gameOverScreen = document.getElementById('game-over');
         const finalScoreDisplay = document.getElementById('final-score');
+        const logo = document.getElementById('logo');
 
-        let mascotX = window.innerWidth / 2 - 75;
+        let mascotX = 0;
         let score = 0;
         let lives = 3;
         let gameActive = false;
         let durians = [];
-        const mascotSpeed = window.innerWidth * 0.02;
-        let durianSpeed = 0.5;
-        const maxDurianSpeed = 2;
+        const mascotSpeed = 10;
+        let durianSpeed = 2;
+        const maxDurianSpeed = 4;
         let gameTime = 0;
 
-        // 加载LOGO图片并处理失败
-        const logo = document.getElementById('logo');
-        const logoImg = new Image();
-        logoImg.src = 'img/logogame.png';
-        logoImg.onload = () => {
-            logo.style.backgroundImage = `url('${logoImg.src}')`;
+        // 图片路径配置（请根据实际路径修改）
+        const imagePaths = {
+            logo: 'img/logogame.png',
+            mascot: 'img/sevenjewelsgame.png',
+            durian: 'img/duriangame.png'
         };
-        logoImg.onerror = () => {
-            console.log('LOGO图片加载失败，使用透明背景');
-            logo.style.backgroundColor = 'transparent';
-        };
+
+        // 加载图片函数
+        function loadImage(element, src) {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                element.style.backgroundImage = `url('${src}')`;
+                console.log(`图片加载成功: ${src}`);
+            };
+            img.onerror = () => {
+                console.log(`图片加载失败，请检查路径: ${src}`);
+            };
+            return img;
+        }
+
+        // 初始化图片
+        loadImage(logo, imagePaths.logo);
+        loadImage(mascot, imagePaths.mascot);
 
         // 键盘控制
         document.addEventListener('keydown', (e) => {
@@ -140,7 +148,7 @@
             mascot.style.left = mascotX + 'px';
         });
 
-        // 移动端触摸控制
+        // 触摸控制
         let touchStartX = 0;
         container.addEventListener('touchstart', (e) => {
             if (!gameActive) return;
@@ -150,7 +158,7 @@
             if (!gameActive) return;
             e.preventDefault();
             const touchX = e.touches[0].clientX;
-            const deltaX = (touchX - touchStartX) * 2;
+            const deltaX = touchX - touchStartX;
             mascotX = Math.max(0, Math.min(window.innerWidth - mascot.offsetWidth, mascotX + deltaX));
             mascot.style.left = mascotX + 'px';
             touchStartX = touchX;
@@ -161,30 +169,21 @@
             if (!gameActive) return;
             const durian = document.createElement('div');
             durian.className = 'durian';
-            const durianWidth = window.innerWidth * 0.05;
+            loadImage(durian, imagePaths.durian);
+            const durianWidth = 50;
             durian.style.left = Math.random() * (window.innerWidth - durianWidth) + 'px';
             durian.style.top = '0px';
             container.appendChild(durian);
             durians.push(durian);
-            console.log('榴莲生成:', durians.length);
-
-            // 图片加载检查
-            const img = new Image();
-            img.src = 'img/duriangame.png';
-            img.onerror = () => {
-                console.log('榴莲图片加载失败，使用透明背景');
-                durian.style.backgroundColor = 'transparent';
-            };
         }
 
         // 更新榴莲位置
         function updateDurians() {
             if (!gameActive) return;
             durians.forEach((durian, index) => {
-                let top = parseFloat(durian.style.top) + durianSpeed;
+                let top = parseFloat(durian.style.top || 0) + durianSpeed;
                 durian.style.top = top + 'px';
 
-                // 检查是否接触吉祥物
                 const mascotRect = mascot.getBoundingClientRect();
                 const durianRect = durian.getBoundingClientRect();
                 if (
@@ -196,12 +195,10 @@
                     score += 10;
                     container.removeChild(durian);
                     durians.splice(index, 1);
-                    console.log('吃到榴莲，得分:', score);
                 } else if (top > window.innerHeight) {
                     lives--;
                     container.removeChild(durian);
                     durians.splice(index, 1);
-                    console.log('榴莲掉落，剩余生命:', lives);
                 }
             });
 
@@ -214,7 +211,7 @@
         // 更新速度
         function updateSpeed() {
             gameTime += 1 / 60;
-            durianSpeed = Math.min(maxDurianSpeed, 0.5 + gameTime / 60);
+            durianSpeed = Math.min(maxDurianSpeed, 2 + gameTime / 60);
         }
 
         // 结束游戏
@@ -232,8 +229,8 @@
             gameActive = true;
             score = 0;
             lives = 3;
-            mascotX = window.innerWidth / 2 - mascot.offsetWidth / 2;
-            durianSpeed = 0.5;
+            mascotX = window.innerWidth / 2 - 50;
+            durianSpeed = 2;
             gameTime = 0;
             mascot.style.left = mascotX + 'px';
             scoreDisplay.textContent = `得分: ${score}`;
@@ -241,7 +238,7 @@
             gameOverScreen.style.display = 'none';
 
             clearInterval(window.durianInterval);
-            window.durianInterval = setInterval(createDurian, 1500);
+            window.durianInterval = setInterval(createDurian, 1000);
             requestAnimationFrame(gameLoop);
         }
 
@@ -254,14 +251,18 @@
             }
         }
 
-        // 窗口大小调整
+        // 窗口调整
         window.addEventListener('resize', () => {
             mascotX = Math.min(mascotX, window.innerWidth - mascot.offsetWidth);
             mascot.style.left = mascotX + 'px';
         });
 
-        // 初次启动游戏
-        startGame();
+        // 页面加载完成时启动游戏
+        window.onload = () => {
+            mascotX = window.innerWidth / 2 - 50;
+            mascot.style.left = mascotX + 'px';
+            startGame();
+        };
     </script>
 </body>
 </html>
