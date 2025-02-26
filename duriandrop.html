@@ -28,7 +28,7 @@
             transform: translate(-50%, -50%);
             width: 20vw;
             height: auto;
-            background-image: url('/assets/img/logogame.png'); 
+            background-image: url('img/logogame.png'); /* 改为相对路径 */
             background-size: contain;
             background-repeat: no-repeat;
             z-index: -1;
@@ -39,7 +39,7 @@
             bottom: 5vh;
             width: 15vw;
             height: 12vh;
-            background-image: url('/assets/img/sevenjewelsgame.png');
+            background-image: url('img/sevenjewelsgame.png'); /* 改为相对路径 */
             background-size: contain;
             background-repeat: no-repeat;
         }
@@ -47,7 +47,7 @@
             position: absolute;
             width: 5vw;
             height: 5vw;
-            background-image: url('/assets/img/duriangame.png');
+            background-image: url('img/duriangame.png'); /* 改为相对路径 */
             background-size: cover;
             border-radius: 50%;
         }
@@ -94,157 +94,169 @@
         </div>
     </div>
 
-<script>
-    const container = document.getElementById('game-container');
-    const mascot = document.getElementById('mascot');
-    const scoreDisplay = document.getElementById('score');
-    const livesDisplay = document.getElementById('lives');
-    const gameOverScreen = document.getElementById('game-over');
-    const finalScoreDisplay = document.getElementById('final-score');
+    <script>
+        const container = document.getElementById('game-container');
+        const mascot = document.getElementById('mascot');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
 
-    let mascotX = window.innerWidth / 2 - 75;
-    let score = 0;
-    let lives = 3;
-    let gameActive = false;
-    let durians = [];
-    const mascotSpeed = window.innerWidth * 0.02;
-    let durianSpeed = 0.5;
-    const maxDurianSpeed = 2;
-    let gameTime = 0;
+        let mascotX = window.innerWidth / 2 - 75;
+        let score = 0;
+        let lives = 3;
+        let gameActive = false;
+        let durians = [];
+        const mascotSpeed = window.innerWidth * 0.02;
+        let durianSpeed = 0.5;
+        const maxDurianSpeed = 2;
+        let gameTime = 0;
 
-    // 键盘控制
-    document.addEventListener('keydown', (e) => {
-        if (!gameActive) return;
-        if (e.key === 'ArrowLeft' && mascotX > 0) {
-            mascotX -= mascotSpeed;
-        } else if (e.key === 'ArrowRight' && mascotX < window.innerWidth - mascot.offsetWidth) {
-            mascotX += mascotSpeed;
-        }
-        mascot.style.left = mascotX + 'px';
-    });
-
-    // 移动端触摸控制
-    let touchStartX = 0;
-    container.addEventListener('touchstart', (e) => {
-        if (!gameActive) return;
-        touchStartX = e.touches[0].clientX;
-    });
-    container.addEventListener('touchmove', (e) => {
-        if (!gameActive) return;
-        e.preventDefault();
-        const touchX = e.touches[0].clientX;
-        const deltaX = (touchX - touchStartX) * 2;
-        mascotX = Math.max(0, Math.min(window.innerWidth - mascot.offsetWidth, mascotX + deltaX));
-        mascot.style.left = mascotX + 'px';
-        touchStartX = touchX;
-    });
-
-    // 创建榴莲
-    function createDurian() {
-        if (!gameActive) return;
-        const durian = document.createElement('div');
-        durian.className = 'durian';
-        const durianWidth = window.innerWidth * 0.05;
-        durian.style.left = Math.random() * (window.innerWidth - durianWidth) + 'px';
-        durian.style.top = '0px';
-        container.appendChild(durian);
-        durians.push(durian);
-        console.log('榴莲生成:', durians.length);
-
-        // 图片加载检查
-        const img = new Image();
-        img.src = 'durian.png';
-        img.onerror = () => {
-            console.log('榴莲图片加载失败，使用透明背景');
-            durian.style.backgroundColor = 'transparent';
+        // 加载LOGO图片并处理失败
+        const logo = document.getElementById('logo');
+        const logoImg = new Image();
+        logoImg.src = 'img/logogame.png';
+        logoImg.onload = () => {
+            logo.style.backgroundImage = `url('${logoImg.src}')`;
         };
-    }
+        logoImg.onerror = () => {
+            console.log('LOGO图片加载失败，使用透明背景');
+            logo.style.backgroundColor = 'transparent';
+        };
 
-    // 更新榴莲位置
-    function updateDurians() {
-        if (!gameActive) return;
-        durians.forEach((durian, index) => {
-            let top = parseFloat(durian.style.top) + durianSpeed;
-            durian.style.top = top + 'px';
-
-            // 检查是否接触吉祥物
-            const mascotRect = mascot.getBoundingClientRect();
-            const durianRect = durian.getBoundingClientRect();
-            if (
-                durianRect.bottom > mascotRect.top &&
-                durianRect.top < mascotRect.bottom &&
-                durianRect.right > mascotRect.left &&
-                durianRect.left < mascotRect.right
-            ) {
-                score += 10;
-                container.removeChild(durian);
-                durians.splice(index, 1);
-                console.log('吃到榴莲，得分:', score);
-            } else if (top > window.innerHeight) {
-                lives--;
-                container.removeChild(durian);
-                durians.splice(index, 1);
-                console.log('榴莲掉落，剩余生命:', lives);
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            if (e.key === 'ArrowLeft' && mascotX > 0) {
+                mascotX -= mascotSpeed;
+            } else if (e.key === 'ArrowRight' && mascotX < window.innerWidth - mascot.offsetWidth) {
+                mascotX += mascotSpeed;
             }
+            mascot.style.left = mascotX + 'px';
         });
 
-        scoreDisplay.textContent = `得分: ${score}`;
-        livesDisplay.textContent = `生命: ${lives}`;
+        // 移动端触摸控制
+        let touchStartX = 0;
+        container.addEventListener('touchstart', (e) => {
+            if (!gameActive) return;
+            touchStartX = e.touches[0].clientX;
+        });
+        container.addEventListener('touchmove', (e) => {
+            if (!gameActive) return;
+            e.preventDefault();
+            const touchX = e.touches[0].clientX;
+            const deltaX = (touchX - touchStartX) * 2;
+            mascotX = Math.max(0, Math.min(window.innerWidth - mascot.offsetWidth, mascotX + deltaX));
+            mascot.style.left = mascotX + 'px';
+            touchStartX = touchX;
+        });
 
-        if (lives <= 0) endGame();
-    }
+        // 创建榴莲
+        function createDurian() {
+            if (!gameActive) return;
+            const durian = document.createElement('div');
+            durian.className = 'durian';
+            const durianWidth = window.innerWidth * 0.05;
+            durian.style.left = Math.random() * (window.innerWidth - durianWidth) + 'px';
+            durian.style.top = '0px';
+            container.appendChild(durian);
+            durians.push(durian);
+            console.log('榴莲生成:', durians.length);
 
-    // 更新速度
-    function updateSpeed() {
-        gameTime += 1 / 60;
-        durianSpeed = Math.min(maxDurianSpeed, 0.5 + gameTime / 60);
-    }
+            // 图片加载检查
+            const img = new Image();
+            img.src = 'img/duriangame.png';
+            img.onerror = () => {
+                console.log('榴莲图片加载失败，使用透明背景');
+                durian.style.backgroundColor = 'transparent';
+            };
+        }
 
-    // 结束游戏
-    function endGame() {
-        gameActive = false;
-        gameOverScreen.style.display = 'block';
-        finalScoreDisplay.textContent = score;
-        durians.forEach(durian => container.removeChild(durian));
-        durians = [];
-        clearInterval(window.durianInterval);
-    }
+        // 更新榴莲位置
+        function updateDurians() {
+            if (!gameActive) return;
+            durians.forEach((durian, index) => {
+                let top = parseFloat(durian.style.top) + durianSpeed;
+                durian.style.top = top + 'px';
 
-    // 开始游戏
-    function startGame() {
-        gameActive = true;
-        score = 0;
-        lives = 3;
-        mascotX = window.innerWidth / 2 - mascot.offsetWidth / 2;
-        durianSpeed = 0.5;
-        gameTime = 0;
-        mascot.style.left = mascotX + 'px';
-        scoreDisplay.textContent = `得分: ${score}`;
-        livesDisplay.textContent = `生命: ${lives}`;
-        gameOverScreen.style.display = 'none';
+                // 检查是否接触吉祥物
+                const mascotRect = mascot.getBoundingClientRect();
+                const durianRect = durian.getBoundingClientRect();
+                if (
+                    durianRect.bottom > mascotRect.top &&
+                    durianRect.top < mascotRect.bottom &&
+                    durianRect.right > mascotRect.left &&
+                    durianRect.left < mascotRect.right
+                ) {
+                    score += 10;
+                    container.removeChild(durian);
+                    durians.splice(index, 1);
+                    console.log('吃到榴莲，得分:', score);
+                } else if (top > window.innerHeight) {
+                    lives--;
+                    container.removeChild(durian);
+                    durians.splice(index, 1);
+                    console.log('榴莲掉落，剩余生命:', lives);
+                }
+            });
 
-        clearInterval(window.durianInterval);
-        window.durianInterval = setInterval(createDurian, 1500);
-        requestAnimationFrame(gameLoop);
-    }
+            scoreDisplay.textContent = `得分: ${score}`;
+            livesDisplay.textContent = `生命: ${lives}`;
 
-    // 游戏循环
-    function gameLoop() {
-        if (gameActive) {
-            updateDurians();
-            updateSpeed();
+            if (lives <= 0) endGame();
+        }
+
+        // 更新速度
+        function updateSpeed() {
+            gameTime += 1 / 60;
+            durianSpeed = Math.min(maxDurianSpeed, 0.5 + gameTime / 60);
+        }
+
+        // 结束游戏
+        function endGame() {
+            gameActive = false;
+            gameOverScreen.style.display = 'block';
+            finalScoreDisplay.textContent = score;
+            durians.forEach(durian => container.removeChild(durian));
+            durians = [];
+            clearInterval(window.durianInterval);
+        }
+
+        // 开始游戏
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            lives = 3;
+            mascotX = window.innerWidth / 2 - mascot.offsetWidth / 2;
+            durianSpeed = 0.5;
+            gameTime = 0;
+            mascot.style.left = mascotX + 'px';
+            scoreDisplay.textContent = `得分: ${score}`;
+            livesDisplay.textContent = `生命: ${lives}`;
+            gameOverScreen.style.display = 'none';
+
+            clearInterval(window.durianInterval);
+            window.durianInterval = setInterval(createDurian, 1500);
             requestAnimationFrame(gameLoop);
         }
-    }
 
-    // 窗口大小调整
-    window.addEventListener('resize', () => {
-        mascotX = Math.min(mascotX, window.innerWidth - mascot.offsetWidth);
-        mascot.style.left = mascotX + 'px';
-    });
+        // 游戏循环
+        function gameLoop() {
+            if (gameActive) {
+                updateDurians();
+                updateSpeed();
+                requestAnimationFrame(gameLoop);
+            }
+        }
 
-    // 初次启动游戏
-    startGame();
-</script>
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            mascotX = Math.min(mascotX, window.innerWidth - mascot.offsetWidth);
+            mascot.style.left = mascotX + 'px';
+        });
+
+        // 初次启动游戏
+        startGame();
+    </script>
 </body>
 </html>
