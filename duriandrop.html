@@ -21,6 +21,19 @@
             background-color: #87ceeb;
             overflow: hidden;
         }
+        #logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20vw;
+            height: auto;
+            background-image: url('/assets/img/logogame.png'); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: -1;
+            pointer-events: none;
+        }
         #mascot {
             position: absolute;
             bottom: 5vh;
@@ -70,6 +83,7 @@
 </head>
 <body>
     <div id="game-container">
+        <div id="logo"></div> <!-- 添加LOGO -->
         <div id="mascot"></div>
         <div id="score">得分: 0</div>
         <div id="lives">生命: 3</div>
