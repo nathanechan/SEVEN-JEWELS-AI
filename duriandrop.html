@@ -26,20 +26,25 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 20vw;
+            width: 15vw; /* 默认桌面大小 */
             height: auto;
-            background-image: url('img/logogame.png'); /* 改为相对路径 */
+            background-image: url('img/logogame.png');
             background-size: contain;
             background-repeat: no-repeat;
             z-index: -1;
             pointer-events: none;
+        }
+        @media (max-width: 768px) { /* 移动设备 */
+            #logo {
+                width: 25vw;
+            }
         }
         #mascot {
             position: absolute;
             bottom: 5vh;
             width: 15vw;
             height: 12vh;
-            background-image: url('img/sevenjewelsgame.png'); /* 改为相对路径 */
+            background-image: url('img/sevenjewelsgame.png');
             background-size: contain;
             background-repeat: no-repeat;
         }
@@ -47,7 +52,7 @@
             position: absolute;
             width: 5vw;
             height: 5vw;
-            background-image: url('img/duriangame.png'); /* 改为相对路径 */
+            background-image: url('img/duriangame.png');
             background-size: cover;
             border-radius: 50%;
         }
